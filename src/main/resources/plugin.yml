@@ -1,0 +1,11 @@
+name: World1-6Clans
+version: 1.0
+author: Andrew121410
+main: com.andrew121410.mc.world16clans.Main
+api-version: 1.16
+depend:
+  - PlaceholderAPI
+
+commands:
+  clan:
+    aliases: clans
