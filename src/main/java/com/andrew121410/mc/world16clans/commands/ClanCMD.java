@@ -61,22 +61,31 @@ public class ClanCMD implements CommandExecutor {
             player.sendMessage(Translate.color("&e/clan alliance &r- Shows help for alliance command."));
             player.sendMessage(Translate.color("&e/clan tag <Name> &r- Sets tag of clan."));
             player.sendMessage(Translate.color("&e/clan motd <Message> &r- Set's message of the day."));
-        } else if (args.length == 3 && args[0].equalsIgnoreCase("create")) {
-            String clanName = args[1];
-            String clanTag = args[2];
+            player.sendMessage(Translate.color("&e/clan c <Message> &r- Sends a message to all online clan members"));
+            player.sendMessage(Translate.color("&e/clan ca <Message> &r- Sends a message to all allies members."));
+            player.sendMessage(Translate.color("&e/clan ct &r- Toggles between clan and clan allies and global chat."));
+        } else if (args[0].equalsIgnoreCase("create")) {
+            if (args.length == 1 || args.length == 2) {
+                player.sendMessage(Translate.color("&e/clan create <Clan> <Tag>"));
+                return true;
+            } else if (args.length == 3) {
+                String clanName = args[1];
+                String clanTag = args[2];
 
-            if (clanUser != null) {
-                player.sendMessage(Translate.color("&cLooks like you already in a clan."));
+                if (clanUser != null) {
+                    player.sendMessage(Translate.color("&cLooks like you already in a clan."));
+                    return true;
+                }
+
+                if (this.clanMap.containsKey(clanName)) {
+                    player.sendMessage(Translate.color("&cClan with that name already exists."));
+                    return true;
+                }
+
+                this.plugin.getClanManager().createClan(clanName, clanTag, player.getUniqueId());
+                player.sendMessage(Translate.color("&6Clan: " + clanName + " has been created!"));
                 return true;
             }
-
-            if (this.clanMap.containsKey(clanName)) {
-                player.sendMessage(Translate.color("&cClan with that name already exists."));
-                return true;
-            }
-
-            this.plugin.getClanManager().createClan(clanName, clanTag, player.getUniqueId());
-            player.sendMessage(Translate.color("&6Clan: " + clanName + " has been created!"));
             return true;
         } else if (args.length == 2 && args[0].equalsIgnoreCase("invite")) {
             String playerName = args[1];
@@ -125,8 +134,8 @@ public class ClanCMD implements CommandExecutor {
                 }
             }
             ComponentBuilder componentBuilder = new ComponentBuilder();
-            player.sendMessage(Translate.color("&6Clan: " + clan.getClanName()) + " Level: " + clan.getLevel());
-            componentBuilder.append("Leader: " + leaderUser.getPlayerName());
+            player.sendMessage(Translate.color("&6Clan: " + clan.getClanName()) + " &bLevel: " + clan.getLevel() + " &5Tag:" + clan.getTag());
+            componentBuilder.append("Leader: ").color(ChatColor.GRAY).append(leaderUser.getPlayerName());
             componentBuilder.append("\n");
             componentBuilder.append("Officers: ").color(ChatColor.GRAY);
             for (ClanUser user : officersUserList) {
@@ -223,17 +232,17 @@ public class ClanCMD implements CommandExecutor {
             if (player.getInventory().contains(Material.ENDER_EYE)) {
                 player.getInventory().remove(Material.ENDER_EYE);
                 clanUser.getClan().setLevel(clanUser.getClan().getLevel() + 1);
-                this.plugin.getServer().broadcastMessage("&9[Clan] &7<" + clanUser.getClan().getTag() + "> has level up to " + clanUser.getClan().getLevel());
+                this.plugin.getServer().broadcastMessage(Translate.color("&9[Clan] &7<" + clanUser.getClan().getTag() + "> has level up to " + clanUser.getClan().getLevel()));
                 return true;
             } else {
-                player.sendMessage("&cNeed ender eye to upgrade clan level.");
+                player.sendMessage(Translate.color("&cNeed ender eye to upgrade clan level."));
             }
             return true;
         } else if (args.length == 2 && args[0].equalsIgnoreCase("kick")) {
             String playerName = args[1];
 
             if (clanUser == null) {
-                player.sendMessage("&cYou aren't in a clan.");
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
                 return true;
             }
 
@@ -250,7 +259,7 @@ public class ClanCMD implements CommandExecutor {
             String playerName = args[1];
 
             if (clanUser == null) {
-                player.sendMessage("&cYou aren't in a clan.");
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
                 return true;
             }
 
@@ -277,7 +286,7 @@ public class ClanCMD implements CommandExecutor {
             return true;
         } else if (args.length == 1 && args[0].equalsIgnoreCase("leave")) {
             if (clanUser == null) {
-                player.sendMessage("&cYou aren't in a clan.");
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
                 return true;
             }
 
@@ -291,7 +300,7 @@ public class ClanCMD implements CommandExecutor {
             return true;
         } else if (args.length == 1 && args[0].equalsIgnoreCase("disband")) {
             if (clanUser == null) {
-                player.sendMessage("&cYou aren't in a clan.");
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
                 return true;
             }
 
@@ -303,10 +312,10 @@ public class ClanCMD implements CommandExecutor {
             String clanName = clanUser.getClan().getClanName();
 
             this.plugin.getClanManager().deleteClan(clanName);
-            Bukkit.getServer().broadcastMessage("&9[Clan] &eClan " + clanName + " has been disband");
+            Bukkit.getServer().broadcastMessage(Translate.color("&9[Clan] &eClan " + clanName + " has been disband"));
         } else if (args.length == 1 && args[0].equalsIgnoreCase("sethome")) {
             if (clanUser == null) {
-                player.sendMessage("&cYou aren't in a clan.");
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
                 return true;
             }
 
@@ -330,7 +339,7 @@ public class ClanCMD implements CommandExecutor {
             return true;
         } else if (args.length == 1 && args[0].equalsIgnoreCase("home")) {
             if (clanUser == null) {
-                player.sendMessage("&cYou aren't in a clan.");
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
                 return true;
             }
 
@@ -349,12 +358,12 @@ public class ClanCMD implements CommandExecutor {
             return true;
         } else if (args.length >= 1 && args[0].equalsIgnoreCase("alliance")) {
             if (clanUser == null) {
-                player.sendMessage("&cYou aren't in a clan.");
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
                 return true;
             }
 
             if (clanUser.getClanRank() != ClanRank.OFFICERS || clanUser.getClanRank() != ClanRank.LEADER) {
-                player.sendMessage(Translate.color("&cNeed to be an officer or leader do ally a clan."));
+                player.sendMessage(Translate.color("&cNeed to be an officer or leader to ally a clan."));
                 return true;
             }
 
@@ -395,6 +404,54 @@ public class ClanCMD implements CommandExecutor {
                 clanUser.getClan().getClanAlliesList().add(clanThatIsAllyWith);
                 this.plugin.getServer().broadcastMessage("&9[Clan] &6" + clanThatIsAllyWith + " is now allied with " + clanUser.getClan().getClanName());
                 return true;
+            }
+            return true;
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("motd")) {
+            if (clanUser == null) {
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
+                return true;
+            }
+
+            if (clanUser.getClanRank() != ClanRank.OFFICERS || clanUser.getClanRank() != ClanRank.LEADER) {
+                player.sendMessage(Translate.color("&cMust be an officer or leader to set motd for clan."));
+                return true;
+            }
+
+            clanUser.getClan().setMotd(args[1]);
+            player.sendMessage(Translate.color("&6The message of the day has been set."));
+            return true;
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("c")) {
+            if (clanUser == null) {
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
+                return true;
+            }
+
+            this.plugin.getClanManager().sendMessageToClanMembers(player, args[1]);
+            return true;
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("ca")) {
+            if (clanUser == null) {
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
+                return true;
+            }
+
+            this.plugin.getClanManager().sendMessageToAlliesMembers(player, args[1]);
+            return true;
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("ct")) {
+            if (clanUser == null) {
+                player.sendMessage(Translate.color("&cYou aren't in a clan."));
+                return true;
+            }
+
+            if (clanUser.getInClanChat()) {
+                clanUser.setInClanChat(false);
+                clanUser.setInAllyChat(true);
+                player.sendMessage(Translate.color("&3&lSwitched to ally chat."));
+            } else if (clanUser.getInAllyChat()) {
+                clanUser.setInAllyChat(false);
+                player.sendMessage(Translate.color("&3&lSwitched to global chat."));
+            } else {
+                clanUser.setInClanChat(true);
+                player.sendMessage(Translate.color("&3&lSwitched to clan chat."));
             }
             return true;
         } else if (args.length == 1 && args[0].equalsIgnoreCase("accept")) {

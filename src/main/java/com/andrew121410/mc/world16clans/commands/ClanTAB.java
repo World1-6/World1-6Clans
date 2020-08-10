@@ -28,7 +28,7 @@ public class ClanTAB implements TabCompleter {
         this.clanMap = this.plugin.getClanStorageManager().getClansMap();
         this.clanUserMap = this.plugin.getClanStorageManager().getClanUserMap();
 
-        this.args = Arrays.asList("create", "invite", "info", "promote", "demote", "levelup", "kick", "pass", "leave", "disband", "sethome", "home", "alliance", "tag", "motd", "accept", "deny");
+        this.args = Arrays.asList("create", "invite", "info", "promote", "demote", "levelup", "kick", "pass", "leave", "disband", "sethome", "home", "alliance", "tag", "motd", "c", "ca", "ct", "accept", "deny");
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.andrew121410.mc.world16clans.Clan;
 import com.andrew121410.mc.world16clans.ClanRank;
 import com.andrew121410.mc.world16clans.ClanUser;
 import com.andrew121410.mc.world16clans.World16Clans;
+import com.andrew121410.mc.world16utils.chat.Translate;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.UUID;
@@ -36,6 +38,10 @@ public class ClanManager {
         for (Map.Entry<UUID, ClanUser> uuidClanUserEntry : clan.getClanUserMap().entrySet()) {
             this.clanUserMap.remove(uuidClanUserEntry.getKey());
         }
+        for (String ally : clan.getClanAlliesList()) {
+            Clan clan1 = this.clanMap.get(ally);
+            clan1.getClanAlliesList().remove(name);
+        }
         this.clanMap.remove(name);
         this.plugin.getClanStorageManager().deleteClan(name);
     }
@@ -52,5 +58,32 @@ public class ClanManager {
         ClanUser clanUser = new ClanUser(uuid);
         clan.getClanUserMap().put(uuid, clanUser);
         this.clanUserMap.put(uuid, clanUser);
+    }
+
+    public void sendMessageToClanMembers(Player player, String message) {
+        ClanUser clanUser = this.clanUserMap.get(player.getUniqueId());
+        if (clanUser == null) return;
+        clanUser.getClan().getClanUserMap().forEach(((uuid, clanUser1) -> {
+            Player player1 = clanUser1.getPlayer();
+            if (player1 == null) return;
+            player1.sendMessage(Translate.color("&9[CLAN] &7<" + clanUser.getClan().getTag() + "> " + message));
+        }));
+    }
+
+    public void sendMessageToAlliesMembers(Player player, String message) {
+        ClanUser clanUser = this.clanUserMap.get(player.getUniqueId());
+        if (clanUser == null) return;
+        Clan clan = clanUser.getClan();
+        for (String c : clan.getClanAlliesList()) {
+            Clan clan1 = this.clanMap.get(c);
+            if (clan1 == null) return;
+            for (Map.Entry<UUID, ClanUser> entry : clan1.getClanUserMap().entrySet()) {
+                UUID k = entry.getKey();
+                ClanUser v = entry.getValue();
+                Player player1 = v.getPlayer();
+                if (player1 == null) continue;
+                player1.sendMessage(Translate.color("&9[CLAN] &7<" + clan.getTag() + "> " + message));
+            }
+        }
     }
 }
